@@ -8,16 +8,15 @@ option(DEBUG_MODE "More debug information" ON)
 if (DEBUG_MODE)
     add_definitions(-DEBUG_MODE)
 endif()
+option(BUILD_ALL_EXAMPLES "Buils all libraries examples" OFF)
 
 find_package(glfw3 3.3 REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
-# add_subdirectory(libs/imgui)
 add_subdirectory(raylib)
 # add_subdirectory(rlExtrasC)
 add_subdirectory(rlExtrasCPP)
+add_subdirectory(rlTilesCPP)
 
 set(IMGUI_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/imgui CACHE PATH "ImGui source directory")
 
@@ -36,7 +35,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/rlExtrasCPP
 )
 
-target_link_libraries(${PROJECT_NAME} glfw OpenGL::GL ${GLEW_LIBRARIES} raylib rlExtrasCPP nlohmann_json)
+target_link_libraries(${PROJECT_NAME} glfw raylib rlExtrasCPP nlohmann_json)
 
 add_executable (FPCameraCPPSample ${CMAKE_CURRENT_SOURCE_DIR}/Examples/FPCameraCPPSample/example.cpp)
 target_link_libraries(FPCameraCPPSample ${PROJECT_NAME})

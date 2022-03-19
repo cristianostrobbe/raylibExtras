@@ -40,6 +40,12 @@ target_link_libraries(${PROJECT_NAME} glfw raylib rlExtrasCPP nlohmann_json)
 add_executable (FPCameraCPPSample ${CMAKE_CURRENT_SOURCE_DIR}/Examples/FPCameraCPPSample/example.cpp)
 target_link_libraries(FPCameraCPPSample ${PROJECT_NAME})
 
+add_executable (FollowCameraCPPSample ${CMAKE_CURRENT_SOURCE_DIR}/Examples/FollowCameraCPPSample/example.cpp)
+target_link_libraries(FollowCameraCPPSample ${PROJECT_NAME})
+
+add_executable (TestFollowCameraCPPSample ${CMAKE_CURRENT_SOURCE_DIR}/Examples/FollowCameraCPPSample/test.cpp)
+target_link_libraries(TestFollowCameraCPPSample ${PROJECT_NAME})
+
 add_executable (ImGuiSample ${CMAKE_CURRENT_SOURCE_DIR}/Examples/ImGuiSample/example.cpp)
 target_link_libraries(ImGuiSample ${PROJECT_NAME})
 

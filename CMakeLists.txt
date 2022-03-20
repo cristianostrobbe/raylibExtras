@@ -46,6 +46,9 @@ target_link_libraries(FollowCameraCPPSample ${PROJECT_NAME})
 add_executable (TestFollowCameraCPPSample ${CMAKE_CURRENT_SOURCE_DIR}/Examples/FollowCameraCPPSample/test.cpp)
 target_link_libraries(TestFollowCameraCPPSample ${PROJECT_NAME})
 
+add_executable (TestVehicleController ${CMAKE_CURRENT_SOURCE_DIR}/Examples/FollowCameraCPPSample/test_vehicle_controller.cpp)
+target_link_libraries(TestVehicleController ${PROJECT_NAME})
+
 add_executable (ImGuiSample ${CMAKE_CURRENT_SOURCE_DIR}/Examples/ImGuiSample/example.cpp)
 target_link_libraries(ImGuiSample ${PROJECT_NAME})
 

@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 3.12)
 
 project("raylibExtras")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -march=native")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -W -Wno-deprecated-declarations -O0 -g -march=native")
+set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -march=native")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -W -Wno-deprecated-declarations -Wno-missing-field-initializers -O0 -g -march=native")
 
 option(DEBUG_MODE "More debug information" ON)
 if (DEBUG_MODE)
@@ -10,7 +10,7 @@ if (DEBUG_MODE)
 endif()
 option(BUILD_ALL_EXAMPLES "Buils all libraries examples" OFF)
 
-find_package(glfw3 3.3 REQUIRED)
+find_package(glfw3 3.2 REQUIRED)
 find_package(nlohmann_json REQUIRED)
 
 add_subdirectory(raylib)

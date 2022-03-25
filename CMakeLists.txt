@@ -52,6 +52,9 @@ target_link_libraries(TestVehicleController ${PROJECT_NAME})
 add_executable (ImGuiSample ${CMAKE_CURRENT_SOURCE_DIR}/Examples/ImGuiSample/example.cpp)
 target_link_libraries(ImGuiSample ${PROJECT_NAME})
 
+add_executable (multi_view ${CMAKE_CURRENT_SOURCE_DIR}/Examples/ImGuiRaylib/multi_cam.cpp)
+target_link_libraries(multi_view ${PROJECT_NAME})
+
 add_executable (ImGuiRaylib ${CMAKE_CURRENT_SOURCE_DIR}/Examples/ImGuiRaylib/example.cpp)
 target_link_libraries(ImGuiRaylib ${PROJECT_NAME})
 

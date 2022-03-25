@@ -46,8 +46,6 @@ int main(int argc, char* argv[])
 	cam.MoveSpeed.z = 10;
 	cam.MoveSpeed.x = 5;
 
-	cam.FarPlane = 5000;
-
 	// Main game loop
 	while (!WindowShouldClose())    // Detect window close button or ESC key
 	{

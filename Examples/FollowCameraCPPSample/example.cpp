@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
 	// Model model = LoadModel("../resources/SimpleCar/simple_cat.gltf");
 
 	Vector3 vechicle_position = { 0.0f, 0.0f, 0.0f };
-	Vector3 relative_position = { 0, 10.0f, -10.0f };
-	Vector3 euler_angles      = { 0, 0.0f, 0.0f }; // pitch , yaw, roll
+	Vector3 relative_position = { 0.0f, 10.0f, -10.0f };
+	Vector3 euler_angles      = { 0.0f, 0.0f, 0.0f }; // pitch , yaw, roll
 
 	FollowCamera cam;
 	cam.Setup(45, vechicle_position, relative_position, euler_angles);
@@ -69,21 +69,21 @@ int main(int argc, char* argv[])
 		cam.Update(vechicle_position, euler_angles);
 
 		BeginDrawing();
-		ClearBackground(SKYBLUE);
+			ClearBackground(SKYBLUE);
 
-		cam.BeginMode3D();
+			cam.BeginMode3D();
 
-		// grid of cube trees on a plane to make a "world"
-		DrawPlane(Vector3{ 0, 0, 0 }, Vector2{ 100, 100 }, BEIGE); // simple world plane
+			// grid of cube trees on a plane to make a "world"
+			DrawPlane(Vector3{ 0, 0, 0 }, Vector2{ 100, 100 }, BEIGE); // simple world plane
 
-		// DrawCubeTexture(tx, Vector3{ x, y, z }, 1, 1, 1, GREEN);
-		DrawModel(model, (Vector3){ vechicle_position.x, vechicle_position.y, vechicle_position.z }, 1.0f, WHITE);   // Draw 3d model with texture
+			// DrawCubeTexture(tx, Vector3{ x, y, z }, 1, 1, 1, GREEN);
+			DrawModel(model, (Vector3){ vechicle_position.x, vechicle_position.y, vechicle_position.z }, 1.0f, WHITE);   // Draw 3d model with texture
 
-		DrawGrid(100, 1.0f);
+			DrawGrid(100, 1.0f);
 
-		cam.EndMode3D();
+			cam.EndMode3D();
 
-		DrawFPS(0, 0);
+			DrawFPS(0, 0);
 		EndDrawing();
 		//----------------------------------------------------------------------------------
 	}

@@ -2,8 +2,11 @@
 
 #include "map_viewer.h"
 #include "model_viewer.h"
-#include "image_viewer.h"
 #include "scene_viewer.h"
+#include "multi_view.h"
+
+#include "FPCamera.h"
+#include "FollowCamera.h"
 
 #include <vector>
 #include <nlohmann/json.hpp>
@@ -15,10 +18,10 @@ bool Quit = false;
 
 bool ImGuiDemoOpen = false;
 
-ImageViewerWindow ImageViewer;
 SceneViewWindow SceneView;
 MapViewWindow MapView;
 ModelViewWindow ModelViewer;
+MultiViewWindow MultiView;
 
 void DoMainMenu()
 {
@@ -36,10 +39,10 @@ void DoMainMenu()
 		if (ImGui::BeginMenu("Window"))
 		{
 			ImGui::MenuItem("ImGui Demo", nullptr, &ImGuiDemoOpen);
-			ImGui::MenuItem("Image Viewer", nullptr, &ImageViewer.Open);
             ImGui::MenuItem("3D View", nullptr, &SceneView.Open);
             ImGui::MenuItem("Map View", nullptr, &MapView.Open);
             ImGui::MenuItem("Model Viewer", nullptr, &ModelViewer.Open);
+			ImGui::MenuItem("Multi Viewer", nullptr, &MultiView.Open);
 
 			ImGui::EndMenu();
 		}
@@ -62,6 +65,10 @@ int main(int argc, char* argv[])
 	InitWindow(screenWidth, screenHeight, "Perception system viewer");
 	SetTargetFPS(30);
 
+	RenderTexture screen1 = LoadRenderTexture(screenWidth/2, screenHeight);
+
+    RenderTexture screeN2 = LoadRenderTexture(screenWidth/2, screenHeight);
+
 	// SetupRLImGui(true); // Default
     // Custom ImGui setup
     InitRLGLImGui();
@@ -70,9 +77,6 @@ int main(int argc, char* argv[])
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     ImGui::StyleColorsDark();
     FinishRLGLImguSetup();
-
-	ImageViewer.Setup();
-    ImageViewer.Open = true;
 
     SceneView.Setup();
     SceneView.Open = true;
@@ -83,13 +87,16 @@ int main(int argc, char* argv[])
     ModelViewer.Setup();
     ModelViewer.Open = true;
 
+    MultiView.Setup();
+    MultiView.Open = true;
+
 	// Main game loop
 	while (!WindowShouldClose() && !Quit)    // Detect window close button or ESC key
 	{
-		ImageViewer.Update();
         SceneView.Update();
         MapView.Update();
         ModelViewer.Update();
+		MultiView.Update();
 
 		BeginDrawing();
 		ClearBackground(DARKGRAY);
@@ -100,9 +107,6 @@ int main(int argc, char* argv[])
 		if (ImGuiDemoOpen)
 			ImGui::ShowDemoWindow(&ImGuiDemoOpen);
 
-		if (ImageViewer.Open)
-            ImageViewer.Show();
-
         if (SceneView.Open)
             SceneView.Show();
 
@@ -110,7 +114,10 @@ int main(int argc, char* argv[])
             MapView.Show(); 
 
         if (ModelViewer.Open)
-            ModelViewer.Show();                        
+            ModelViewer.Show();   
+
+        if (MultiView.Open)
+            MultiView.Show();   
 
 		EndRLImGui();
 
@@ -123,10 +130,10 @@ int main(int argc, char* argv[])
 	}
 	ShutdownRLImGui();
 
-    ImageViewer.Shutdown();
     SceneView.Shutdown();
     MapView.Shutdown();
     ModelViewer.Shutdown();
+	MultiView.Shutdown();
 
 	// De-Initialization
 	//--------------------------------------------------------------------------------------   

@@ -13,5 +13,6 @@ add_library(${PROJECT_NAME} SHARED
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+target_include_directories(${PROJECT_NAME} PUBLIC .)
 
 target_link_libraries(${PROJECT_NAME} raylib)

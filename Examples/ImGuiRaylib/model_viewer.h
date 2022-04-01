@@ -1,19 +1,42 @@
 #pragma once
+/*******************************************************************************************
+*
+*   raylib [core] example - Third Person follow camera Example
+*
+*   This example has been created using raylib 4.0 (www.raylib.com)
+*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*
+*   Copyright (c) 2022 Cristiano Strobbe (@cristianostrobbe)
+*
+********************************************************************************************/
+
 #include "common.h"
 
 #include <vector>
-#include <nlohmann/json.hpp>
 #include <fstream>
 
-using json = nlohmann::json;
+#define RLIGHTS_IMPLEMENTATION
+#include "rlights.h"
+
+#if defined(PLATFORM_DESKTOP)
+    #define GLSL_VERSION            330
+#else   // PLATFORM_RPI, PLATFORM_ANDROID, PLATFORM_WEB
+    #define GLSL_VERSION            100
+#endif
 
 class ModelViewWindow : public DocumentWindow
 {
 public:
     FPCamera Camera;
     Model model = { 0 };
+    Model floor = { 0 };
+    Light light = { 0 };
+    Shader shader = { 0 };
     Material material = { 0 };
     Texture2D GridTexture = { 0 };
+    Texture2D model_texture = { 0 };
+    Texture2D model_texture_metalness = { 0 };
+
     // Model orientation
     float pitch = 0.0f;
     float roll  = 0.0f; 
@@ -27,51 +50,42 @@ public:
         ViewTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
 
         Camera.HideCursor = false;
-        Camera.Setup(45, Vector3{ 0,5,10 });
+        Camera.Setup(45, Vector3Zero());
 
         Camera.MoveSpeed.z = 10;
         Camera.MoveSpeed.x = 10;
 
-        // Image img = GenImageChecked(256, 256, 32, 32, DARKGRAY, WHITE);
-        // GridTexture = LoadTextureFromImage(img);
-        // UnloadImage(img);
-        // SetTextureFilter(GridTexture, TEXTURE_FILTER_ANISOTROPIC_16X);
-        // SetTextureWrap(GridTexture, TEXTURE_WRAP_CLAMP);
+        shader = LoadShader(TextFormat("../raylib/examples/models/resources/shaders/glsl%i/base_lighting.vs", GLSL_VERSION),
+                            TextFormat("../raylib/examples/models/resources/shaders/glsl%i/lighting.fs", GLSL_VERSION));
 
-        // model = LoadModel("../resources/plane.obj");                  // Load model
-        // Texture2D model_texture = LoadTexture("../resources/plane_diffuse.png");  // Load model texture
-        // model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = model_texture; // Set map diffuse texture
+        // Get some required shader loactions
+        shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+        // Ambient light level (some basic lighting)
+        int ambientLoc = GetShaderLocation(shader, "ambient");
+        SetShaderValue(shader, ambientLoc, (float[4]){ 0.1f, 0.1f, 0.1f, 1.0f }, SHADER_UNIFORM_VEC4);
 
-        // model = LoadModel("../resources/SimpleCar/simple_car.gltf");
-        // GridTexture = LoadTexture("../resources/SimpleCar/simple_car.png");  // Load model texture
-        
-        // model = LoadModel("../resources/SimpleCar/simple_car.obj");
-        // Texture2D model_texture = LoadTexture("../resources/SimpleCar/simple_car.png");  // Load model texture
-        // model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = model_texture; // Set map diffuse texture
-
-        model = LoadModel("../resources/Testarossa/Testarossa.gltf");
+        model = LoadModel("../resources/Opel_1967/Opel_1967.gltf");
         model.transform = MatrixRotateXYZ((Vector3){ DEG2RAD*(pitch - 90.0f), DEG2RAD*yaw, DEG2RAD*roll });
 
-        // model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = GridTexture; 
-        // GridTexture = LoadTexture("resources/models/obj/plane_diffuse.png")
-        // Image img = GenImageChecked(256, 256, 32, 32, DARKGRAY, WHITE);
-        // GridTexture = LoadTextureFromImage(img);
-        // UnloadImage(img);
-        // SetTextureFilter(GridTexture, TEXTURE_FILTER_ANISOTROPIC_16X);
-        // SetTextureWrap(GridTexture, TEXTURE_WRAP_CLAMP);
+        floor = LoadModelFromMesh(GenMeshPlane(10.0f, 10.0f, 3, 3));
+        floor.materials[0].shader = shader;
+
+        light = CreateLight(LIGHT_POINT, (Vector3){ 0, 10, 0 }, Vector3Zero(), (Color){150, 120, 120, 120}, shader);
+
     }
 
     void Shutdown() override
     {
         UnloadRenderTexture(ViewTexture);
         UnloadTexture(GridTexture);
+        // UnloadTexture(model_texture);
         UnloadModel(model); // Unload model data
     }
 
     void Show() override
     {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        ImGui::SetNextWindowSizeConstraints(ImVec2(1024, 768), ImVec2((float)GetScreenWidth(), (float)GetScreenHeight()));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(1600, 900), ImVec2((float)GetScreenWidth(), (float)GetScreenHeight()));
 
         if (ImGui::Begin("Model viewer", &Open, ImGuiWindowFlags_NoScrollbar))
         {
@@ -106,46 +120,37 @@ public:
             ViewTexture = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
         }
 
-        // Plane pitch (x-axis) controls
-        if (IsKeyDown(KEY_DOWN)) pitch += 0.6f;
-        else if (IsKeyDown(KEY_UP)) pitch -= 0.6f;
-        else
-        {
-            if (pitch > 0.3f) pitch -= 0.3f;
-            else if (pitch < -0.3f) pitch += 0.3f;
-        }
+        // Update light values (actually, only enable/disable them)
+        UpdateLightValues(shader, light);
+
+        // Update the shader with the camera view vector (points towards { 0.0f, 0.0f, 0.0f })
+        Vector3 cam_pos = Camera.GetCameraPosition();
+        float cameraPos[3] = { cam_pos.x, cam_pos.y, cam_pos.z };
+        SetShaderValue(shader, shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
 
         // Plane roll (z-axis) controls
-        if (IsKeyDown(KEY_LEFT)) roll += 1.0f;
-        else if (IsKeyDown(KEY_RIGHT)) roll -= 1.0f;
-        else
-        {
-            if (roll > 0.0f) roll -= 0.5f;
-            else if (roll < 0.0f) roll += 0.5f;
-        }
-
-        // Move model
-        if (IsKeyDown(KEY_A)) x += 0.1f;
-        else if (IsKeyDown(KEY_D)) x -= 0.1f;
-        else if (IsKeyDown(KEY_S)) z -= 0.1f;
-        else if (IsKeyDown(KEY_W)) z += 0.1f;
+        if (IsKeyDown(KEY_LEFT)) yaw += 1.0f;
+        else if (IsKeyDown(KEY_RIGHT)) yaw -= 1.0f;
 
         model.transform = MatrixRotateXYZ((Vector3){ DEG2RAD*(pitch - 90.0f), DEG2RAD*yaw, DEG2RAD*roll });
 
+        DrawText("Use left and right keys to rotate model", 10, 40, 20, DARKGRAY);
+
         BeginTextureMode(ViewTexture);
-        ClearBackground(SKYBLUE);
-        // ClearBackground(BLACK);
+            ClearBackground(SKYBLUE);
+            // ClearBackground(BLACK);
 
-        if (Focused && IsMouseButtonDown(1))
-            Camera.Update();
+            if (Focused && IsMouseButtonDown(1))
+                Camera.Update();
 
-        Camera.BeginMode3D();
+            Camera.BeginMode3D();
 
-        DrawGrid(10, 2.5f); // Draw a grid
-        DrawModel(model, (Vector3){ x, y, z }, 1.0f, WHITE);   // Draw 3d model with texture
+                DrawModel(floor, Vector3Zero(), 1.0f, LIGHTGRAY);
+                DrawGrid(10, 1.0f); // Draw a grid
+                DrawModel(model, (Vector3){ x, y, z }, 0.01f, WHITE);   // Draw 3d model with texture
 
-        Camera.EndMode3D();
+            Camera.EndMode3D();
+
         EndTextureMode();
- 
     }
 };

@@ -46,7 +46,7 @@ void FPCamera::Setup(float fovY, Vector3&& position)
     CameraPosition = position;
     ViewCamera.position = { position.x, position.y, position.z };
     ViewCamera.position.y += PlayerEyesPosition;
-    ViewCamera.target = Vector3Add(ViewCamera.position, Vector3{ 0, 0, 1 });
+    ViewCamera.target = Vector3Add(ViewCamera.position, Vector3{ 0, 0, 1 });;
     ViewCamera.up = { 0.0f, 1.0f, 0.0f };
     ViewCamera.fovy = fovY;
     ViewCamera.projection = CAMERA_PERSPECTIVE;
@@ -55,7 +55,7 @@ void FPCamera::Setup(float fovY, Vector3&& position)
     if (HideCursor && Focused && (UseMouseX || UseMouseY))
         DisableCursor();
 
-    TargetDistance = 1;
+    TargetDistance = 1.0f;
 
     ViewResized();
     PreviousMousePosition = GetMousePosition();

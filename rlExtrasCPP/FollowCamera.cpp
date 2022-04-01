@@ -2,11 +2,9 @@
 *
 *   raylibExtras * Utilities and Shared Components for Raylib
 *
-*   RLAssets * Simple Asset Managment System for Raylib
-*
 *   LICENSE: MIT
 *
-*   Copyright (c) 2020 Jeffery Myers
+*   Copyright (c) 2022 Cristiano Strobbe
 *
 *   Permission is hereby granted, free of charge, to any person obtaining a copy
 *   of this software and associated documentation files (the "Software"), to deal
@@ -43,10 +41,12 @@ FollowCamera::FollowCamera() : ControlsKeys{ 'W', 'S', 'D', 'A', 'E', 'Q', KEY_L
 
 void FollowCamera::Setup(float fovY, Vector3& position, Vector3& relative_position, Vector3& angles)
 {
-    rel_position   = relative_position;
+    RelativePosition = relative_position;
     rot_matrix = MatrixRotateXYZ((Vector3){ DEG2RAD*angles.x, DEG2RAD*angles.y, DEG2RAD*angles.z });
-    Vector3 rotated_veh_position = Vector3Transform(rel_position, rot_matrix);
-    Vector3 new_cam_position = Vector3Add(rotated_veh_position, position);
+    Vector3 rotated_vec_position = Vector3Transform(RelativePosition, rot_matrix);
+    Vector3 new_cam_position = Vector3Add(rotated_vec_position, position);
+    
+    // Camera setup
     ViewCamera.position = new_cam_position;
     ViewCamera.target   = position;
     ViewCamera.up = { 0.0f, 1.0f, 0.0f };
@@ -57,7 +57,7 @@ void FollowCamera::Setup(float fovY, Vector3& position, Vector3& relative_positi
     if (HideCursor && Focused && (UseMouseX || UseMouseY))
         DisableCursor();
 
-    TargetDistance = 1;
+    // TargetDistance = 1;
 
     ViewResized();
     PreviousMousePosition = GetMousePosition();
@@ -140,8 +140,8 @@ void FollowCamera::EndMode3D()
 void FollowCamera::Update(Vector3& position, Vector3& angles)
 {
     rot_matrix = MatrixRotateXYZ((Vector3){ DEG2RAD*angles.x, DEG2RAD*angles.y, DEG2RAD*angles.z });
-    Vector3 rotated_veh_position = Vector3Transform(rel_position, rot_matrix);
-    Vector3 new_cam_position = Vector3Add(rotated_veh_position, position);
+    Vector3 rotated_vec_position = Vector3Transform(RelativePosition, rot_matrix);
+    Vector3 new_cam_position = Vector3Add(rotated_vec_position, position);
     ViewCamera.position = new_cam_position;
     ViewCamera.target = position;
 
@@ -163,152 +163,6 @@ void FollowCamera::Update(Vector3& position, Vector3& angles)
     Vector2 mousePositionDelta = { 0.0f, 0.0f };
     Vector2 mousePosition = GetMousePosition();
     float mouseWheelMove = GetMouseWheelMove();
-
-    // // Keys input detection
-    // float direction[MOVE_DOWN + 1] = { GetSpeedForAxis(MOVE_FRONT,MoveSpeed.z),
-    //                                   GetSpeedForAxis(MOVE_BACK,MoveSpeed.z),
-    //                                   GetSpeedForAxis(MOVE_RIGHT,MoveSpeed.x),
-    //                                   GetSpeedForAxis(MOVE_LEFT,MoveSpeed.x),
-    //                                   GetSpeedForAxis(MOVE_UP,MoveSpeed.y),
-    //                                   GetSpeedForAxis(MOVE_DOWN,MoveSpeed.y) };
-
-    // if (UseController && IsGamepadAvailable(ControlerID))
-    // {
-    //     bool sprint = IsKeyDown(ControlsKeys[SPRINT]) || IsGamepadButtonDown(ControlerID, ControlerSprintButton);
-    //     float factor = MoveSpeed.z * GetFrameTime();
-    //     if (sprint)
-    //         factor *= 2;
-
-    //     float forward = -GetGamepadAxisMovement(ControlerID, ControlerForwardAxis) * factor;
-    //     if (forward > 0)
-    //     {
-    //         direction[MOVE_FRONT] = std::max(direction[MOVE_FRONT], forward);
-    //         direction[MOVE_BACK] = 0;
-    //     }
-    //     else if(forward < 0)
-    //     {
-    //         direction[MOVE_BACK] = std::max(direction[MOVE_BACK], fabs(forward));
-    //         direction[MOVE_FRONT] = 0;
-    //     }
-
-    //     factor = MoveSpeed.x * GetFrameTime();
-    //     if (sprint)
-    //         factor *= 2;
-
-    //     float side = GetGamepadAxisMovement(ControlerID, ControllerSideAxis) * factor;
-    //     if (side > 0)
-    //     {
-    //         direction[MOVE_RIGHT] = std::max(direction[MOVE_RIGHT], side);
-    //         direction[MOVE_LEFT] = 0;
-    //     }
-    //     else if (side < 0)
-    //     {
-    //         direction[MOVE_LEFT] = std::max(direction[MOVE_LEFT], fabs(side));
-    //         direction[MOVE_RIGHT] = 0;
-    //     }
-    // }
-
-    // mousePositionDelta.x = mousePosition.x - PreviousMousePosition.x;
-    // mousePositionDelta.y = mousePosition.y - PreviousMousePosition.y;
-
-    // PreviousMousePosition = mousePosition;
-
-    // Vector3 forward = Vector3Subtract(ViewCamera.target, ViewCamera.position);
-    // forward.y = 0;
-    // forward = Vector3Normalize(forward);
-
-    // Vector3 right{ forward.z * -1.0f, 0, forward.x };
-
-    // Vector3 oldPosition = CameraPosition;
-
-    // CameraPosition = Vector3Add(CameraPosition, Vector3Scale(forward, direction[MOVE_FRONT] - direction[MOVE_BACK]));
-    // CameraPosition = Vector3Add(CameraPosition, Vector3Scale(right, direction[MOVE_RIGHT] - direction[MOVE_LEFT]));
-
-    // CameraPosition.y += direction[MOVE_UP] - direction[MOVE_DOWN];
-
-    // // let someone modify the projected position
-    // if (ValidateCamPosition != nullptr)
-    //     ValidateCamPosition(*this, CameraPosition, oldPosition);
-
-    // // Camera orientation calculation
-    // float turnRotation = GetSpeedForAxis(TURN_RIGHT, TurnSpeed.x) - GetSpeedForAxis(TURN_LEFT, TurnSpeed.x);
-    // float tiltRotation = GetSpeedForAxis(TURN_UP, TurnSpeed.y) - GetSpeedForAxis(TURN_DOWN, TurnSpeed.y);
-
-    // if (UseController && IsGamepadAvailable(ControlerID))
-    // {
-    //     float factor = GetFrameTime() * TurnSpeed.x;
-
-    //     float turn = GetGamepadAxisMovement(ControlerID, ControllerYawAxis) * factor;
-    //     if (turn > 0)
-    //     {
-    //         turnRotation = std::max(turnRotation, turn);
-    //     }
-    //     else if (turn < 0)
-    //     {
-    //         turnRotation = std::min(turnRotation, turn);
-    //     }
-
-    //     factor = GetFrameTime() * TurnSpeed.y;
-    //     float tilt = -GetGamepadAxisMovement(ControlerID, ControllerPitchAxis) * factor;
-    //     if (tilt > 0)
-    //     {
-    //         tiltRotation = std::max(turnRotation, tilt);
-    //     }
-    //     else if (tilt < 0)
-    //     {
-    //         tiltRotation = std::min(turnRotation, tilt);
-    //     }
-    // }
-
-    // if (turnRotation != 0)
-    //     Angle.x -= turnRotation * DEG2RAD;
-    // else if (UseMouseX && Focused)
-    //     Angle.x += (mousePositionDelta.x / -MouseSensitivity);
-
-    // if (tiltRotation)
-    //     Angle.y += tiltRotation * DEG2RAD;
-    // else if (UseMouseY && Focused)
-    //     Angle.y += (mousePositionDelta.y / -MouseSensitivity);
-
-    // // Angle clamp
-    // if (Angle.y < MinimumViewY * DEG2RAD)
-    //     Angle.y = MinimumViewY * DEG2RAD;
-    // else if (Angle.y > MaximumViewY * DEG2RAD)
-    //     Angle.y = MaximumViewY * DEG2RAD;
-
-    // // Recalculate camera target considering translation and rotation
-    // Vector3 target = Vector3Transform(Vector3{ 0, 0, 1 }, MatrixRotateXYZ(Vector3{ Angle.y, -Angle.x, 0 }));
-
-    // ViewCamera.position = CameraPosition;
-
-    // float eyeOfset = PlayerEyesPosition;
-
-    // if (ViewBobbleFreq > 0)
-    // {
-    //     float swingDelta = std::fmax(std::abs(direction[MOVE_FRONT] - direction[MOVE_BACK]), std::abs(direction[MOVE_RIGHT] - direction[MOVE_LEFT]));
-
-    //     // If movement detected (some key pressed), increase swinging
-    //     CurrentBobble += swingDelta * ViewBobbleFreq;
-
-    //     constexpr float ViewBobbleDampen = 8.0f;
-
-    //     eyeOfset -= sinf(CurrentBobble / ViewBobbleDampen) * ViewBobbleMagnatude;
-
-    //     ViewCamera.up.x = sinf(CurrentBobble / (ViewBobbleDampen * 2)) * ViewBobbleWaverMagnitude;
-    //     ViewCamera.up.z = -sinf(CurrentBobble / (ViewBobbleDampen * 2)) * ViewBobbleWaverMagnitude;
-    // }
-    // else
-    // {
-    //     CurrentBobble = 0;
-    //     ViewCamera.up.x = 0;
-    //     ViewCamera.up.z = 0;
-    // }
-
-    // ViewCamera.position.y += eyeOfset;
-
-    // ViewCamera.target.x = ViewCamera.position.x + target.x;
-    // ViewCamera.target.y = ViewCamera.position.y + target.y;
-    // ViewCamera.target.z = ViewCamera.position.z + target.z;
 }
 
 float FollowCamera::GetFOVX() const
@@ -327,4 +181,9 @@ void FollowCamera::SetCameraPosition(const Vector3&& pos)
     Vector3 forward = Vector3Subtract(ViewCamera.target, ViewCamera.position);
     ViewCamera.position = CameraPosition;
     ViewCamera.target = Vector3Add(CameraPosition, forward);
+}
+
+void FollowCamera::SetCameraRelativePosition(Vector3& rel_pos)
+{ 
+    RelativePosition = rel_pos;
 }

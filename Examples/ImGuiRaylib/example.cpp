@@ -1,15 +1,22 @@
+/*******************************************************************************************
+*
+*   raylib [core] example - Third Person follow camera Example
+*
+*   This example has been created using raylib 4.0 (www.raylib.com)
+*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*
+*   Copyright (c) 2022 Cristiano Strobbe (@cristianostrobbe)
+*
+********************************************************************************************/
+
 #include "common.h"
 
-#include "map_viewer.h"
 #include "model_viewer.h"
 #include "image_viewer.h"
 #include "scene_viewer.h"
 
 #include <vector>
-#include <nlohmann/json.hpp>
 #include <fstream>
-
-using json = nlohmann::json;
 
 bool Quit = false;
 
@@ -17,7 +24,6 @@ bool ImGuiDemoOpen = false;
 
 ImageViewerWindow ImageViewer;
 SceneViewWindow SceneView;
-MapViewWindow MapView;
 ModelViewWindow ModelViewer;
 
 void DoMainMenu()
@@ -38,7 +44,6 @@ void DoMainMenu()
 			ImGui::MenuItem("ImGui Demo", nullptr, &ImGuiDemoOpen);
 			ImGui::MenuItem("Image Viewer", nullptr, &ImageViewer.Open);
             ImGui::MenuItem("3D View", nullptr, &SceneView.Open);
-            ImGui::MenuItem("Map View", nullptr, &MapView.Open);
             ImGui::MenuItem("Model Viewer", nullptr, &ModelViewer.Open);
 
 			ImGui::EndMenu();
@@ -58,15 +63,14 @@ int main(int argc, char* argv[])
 	int screenWidth = 1280;
 	int screenHeight = 800;
 
-	SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
-	InitWindow(screenWidth, screenHeight, "Perception system viewer");
+	SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_HIGHDPI | FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
+	InitWindow(screenWidth, screenHeight, "Demo");
 	SetTargetFPS(30);
 
 	// SetupRLImGui(true); // Default
     // Custom ImGui setup
     InitRLGLImGui();
 	ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
-    ImGui::GetIO().Fonts->AddFontFromFileTTF("../resources/fonts/Roboto-Medium.ttf", 14.0f);
     ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     ImGui::StyleColorsDark();
     FinishRLGLImguSetup();
@@ -77,9 +81,6 @@ int main(int argc, char* argv[])
     SceneView.Setup();
     SceneView.Open = true;
 
-    MapView.Setup();
-    MapView.Open = true;
-
     ModelViewer.Setup();
     ModelViewer.Open = true;
 
@@ -88,7 +89,6 @@ int main(int argc, char* argv[])
 	{
 		ImageViewer.Update();
         SceneView.Update();
-        MapView.Update();
         ModelViewer.Update();
 
 		BeginDrawing();
@@ -106,11 +106,8 @@ int main(int argc, char* argv[])
         if (SceneView.Open)
             SceneView.Show();
 
-        if (MapView.Open)
-            MapView.Show(); 
-
         if (ModelViewer.Open)
-            ModelViewer.Show();                        
+            ModelViewer.Show();                  
 
 		EndRLImGui();
 
@@ -125,7 +122,6 @@ int main(int argc, char* argv[])
 
     ImageViewer.Shutdown();
     SceneView.Shutdown();
-    MapView.Shutdown();
     ModelViewer.Shutdown();
 
 	// De-Initialization

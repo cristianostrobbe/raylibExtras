@@ -1,5 +1,16 @@
-#include "common.h"
+#pragma once
+/*******************************************************************************************
+*
+*   raylib [core] example - Third Person follow camera Example
+*
+*   This example has been created using raylib 4.0 (www.raylib.com)
+*   raylib is licensed under an unmodified zlib/libpng license (View raylib.h for details)
+*
+*   Copyright (c) 2022 Cristiano Strobbe (@cristianostrobbe)
+*
+********************************************************************************************/
 
+#include "common.h"
 #include <vector>
 #include <nlohmann/json.hpp>
 #include <fstream>

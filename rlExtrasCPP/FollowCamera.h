@@ -2,11 +2,9 @@
 *
 *   raylibExtras * Utilities and Shared Components for Raylib
 *
-*   RLAssets * Simple Asset Managment System for Raylib
-*
 *   LICENSE: MIT
 *
-*   Copyright (c) 2020 Jeffery Myers
+*   Copyright (c) 2022 Cristiano Strobbe
 *
 *   Permission is hereby granted, free of charge, to any person obtaining a copy
 *   of this software and associated documentation files (the "Software"), to deal
@@ -43,15 +41,20 @@ public:
     FollowCamera();
 
     void Setup(float fovY, Vector3& position, Vector3& relative_position, Vector3& angles);
+    
     void ViewResized();
 
     void Update(Vector3& position, Vector3& angles);
 
     float GetFOVX() const;
-    Vector3 GetCameraPosition() const;
-    void SetCameraPosition(const Vector3&& pos);
 
-    inline Vector2 GetViewAngles() const { return Vector2Scale(Angle, 1.0f / DEG2RAD); }
+    Vector3 GetCameraPosition() const;
+    
+    void SetCameraPosition(const Vector3&& pos);
+    
+    void SetCameraRelativePosition(Vector3& rel_pos);
+
+    // inline Vector2 GetViewAngles() const { return Vector2Scale(Angle, 1.0f / DEG2RAD); }
 
     typedef enum
     {
@@ -71,63 +74,61 @@ public:
 
     int ControlsKeys[LAST_CONTROL];
 
-    Vector3 MoveSpeed = { 1, 1, 1 }; // Same as player
-    Vector2 TurnSpeed = { 90, 90 };
+    // Vector3 MoveSpeed = { 1, 1, 1 }; // Same as player
+    // Vector2 TurnSpeed = { 90, 90 };
 
-    float MouseSensitivity = 600;
+    // float MouseSensitivity = 600;
 
-    float MinimumViewY = -65.0f;
-    float MaximumViewY = 89.0f;
+    // float MinimumViewY = -65.0f;
+    // float MaximumViewY = 89.0f;
 
-    float ViewBobbleFreq = 0.0f;
-    float ViewBobbleMagnatude = 0.02f;
-    float ViewBobbleWaverMagnitude = 0.002f;
+    // float ViewBobbleFreq = 0.0f;
+    // float ViewBobbleMagnatude = 0.02f;
+    // float ViewBobbleWaverMagnitude = 0.002f;
 
-    typedef std::function<bool(FollowCamera& camera, Vector3& newPosition, const Vector3& oldPosition)> PositionCallback;
-    PositionCallback ValidateCamPosition = nullptr;
+    // typedef std::function<bool(FollowCamera& camera, Vector3& newPosition, const Vector3& oldPosition)> PositionCallback;
+    //PositionCallback ValidateCamPosition = nullptr;
 
     inline const Camera& GetCamera() const { return ViewCamera; }
+
     inline const RLFrustum& GetFrustum() const { return Frustum; }
 
     inline void ExtractFrustum() { Frustum.Extract(); }
 
-    // start drawing using the camera, with near/far plane support
+    // Start drawing using the camera, with near/far plane support
     void BeginMode3D();
 
-    // end drawing with the camera
+    // End drawing with the camera
     void EndMode3D();
 
-    bool UseMouseX = true;
-    bool UseMouseY = true;
-
+    bool UseMouseX   = true;
+    bool UseMouseY   = true;
     bool UseKeyboard = true;
 
-    bool UseController = true;
-    bool ControlerID = 0;
+    // --------------- Controller --------------- //
+    // bool UseController = true;
+    // bool ControlerID = 0;
 
-    int ControlerForwardAxis = GAMEPAD_AXIS_LEFT_Y;
-    int ControllerSideAxis = GAMEPAD_AXIS_LEFT_X;
-    int ControllerPitchAxis = GAMEPAD_AXIS_RIGHT_Y;
-    int ControllerYawAxis = GAMEPAD_AXIS_RIGHT_X;
-    int ControlerSprintButton = GAMEPAD_BUTTON_LEFT_TRIGGER_1;
+    // int ControlerForwardAxis  = GAMEPAD_AXIS_LEFT_Y;
+    // int ControllerSideAxis    = GAMEPAD_AXIS_LEFT_X;
+    // int ControllerPitchAxis   = GAMEPAD_AXIS_RIGHT_Y;
+    // int ControllerYawAxis     = GAMEPAD_AXIS_RIGHT_X;
+    // int ControlerSprintButton = GAMEPAD_BUTTON_LEFT_TRIGGER_1;
+    // ------------------------------------------ //
 
-    //clipping planes
+    // Clipping planes
     // note must use BeginMode3D and EndMode3D on the camera object for clipping planes to work
     double NearPlane = 0.01;
     double FarPlane  = 1000;
 
-    bool HideCursor = true;
-
-    Camera* GetRaylibCamera(){
-        return &ViewCamera;
-    };
+    bool HideCursor  = true;
 
 protected:
-    Matrix rot_matrix = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f};
-    Vector3 rel_position ={0.0f,0.0f,0.0f};
+    Matrix rot_matrix = {0};
+    Vector3 rel_position = {0.0f,0.0f,0.0f};
 
     bool Focused = true;
-    Vector3 CameraPosition = { 0.0f,0.0f,0.0f };
+    Vector3 CameraPosition   = { 0.0f,0.0f,0.0f };
     Vector3 RelativePosition = { 0.0f,0.0f,0.0f };
 
     Camera ViewCamera = { 0 };
@@ -135,13 +136,15 @@ protected:
 
     Vector2 PreviousMousePosition = { 0.0f, 0.0f };
 
-    float TargetDistance = 0;               // Camera distance from position to target
-    float PlayerEyesPosition = 5.0f;       // Player eyes position from ground (in meters)
-    Vector2 Angle = { 0,0 };                // Camera angle in plane XZ
+    // float TargetDistance = 0;               // Camera distance from position to target
+    // float PlayerEyesPosition = 5.0f;       // Player eyes position from ground (in meters)
+    // Vector2 Angle = { 0,0 };                // Camera angle in plane XZ
 
-    float CurrentBobble = 0;
+    // float CurrentBobble = 0;
 
     RLFrustum Frustum;
+
+    Camera* GetRaylibCamera(){ return &ViewCamera; };
 
     float GetSpeedForAxis(CameraControls axis, float speed);
 };

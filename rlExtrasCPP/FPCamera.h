@@ -128,7 +128,7 @@ protected:
 
     Vector2 PreviousMousePosition = { 0.0f, 0.0f };
 
-    float TargetDistance = 0;               // Camera distance from position to target
+    float TargetDistance = 0.0f;               // Camera distance from position to target
     float PlayerEyesPosition = 0.5f;       // Player eyes position from ground (in meters)
     Vector2 Angle = { 0,0 };                // Camera angle in plane XZ
 

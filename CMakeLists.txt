@@ -35,6 +35,10 @@ include_directories(
 )
 
 target_link_libraries(${PROJECT_NAME} glfw raylib rlExtrasCPP)
+target_include_directories(${PROJECT_NAME} PUBLIC 
+    ${IMGUI_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/rlImGui
+)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)

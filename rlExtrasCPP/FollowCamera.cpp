@@ -49,7 +49,7 @@ void FollowCamera::Setup(float fovY, Vector3& position, Vector3& relative_positi
     // Camera setup
     ViewCamera.position = new_cam_position;
     ViewCamera.target   = position;
-    ViewCamera.up = { 0.0f, 1.0f, 0.0f };
+    ViewCamera.up = { 0.0f, 0.0f, 1.0f };
     ViewCamera.fovy = fovY;
     ViewCamera.projection = CAMERA_PERSPECTIVE;
 

@@ -12,7 +12,7 @@ __RaylibExtras__ provides an easy way to create your 2D/3D application based on 
 
 !["demo"](resources/images/demo.png)
 
-# Table of content
+# Table of contents
 - [__RaylibExtras__](#raylibextras)
 - [Table of content](#table-of-content)
 - [__How to use__](#how-to-use)
